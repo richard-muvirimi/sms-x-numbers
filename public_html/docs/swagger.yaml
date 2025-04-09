@@ -1,0 +1,214 @@
+openapi: 3.0.0
+info:
+  title: SMS Numbers API
+  version: 1.0.0
+  description: API for processing and managing phone number files
+
+servers:
+  - url: http://localhost:8000/api/v1
+    description: Local development server
+
+paths:
+  /files/process:
+    post:
+      summary: Process a file containing phone numbers
+      tags:
+        - Files
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                numbers:
+                  type: string
+                  description: Raw text content with phone numbers (one per line or comma-separated)
+                  nullable: true
+                file:
+                  type: string
+                  format: binary
+                  description: CSV, Excel, or text file containing phone numbers
+                  nullable: true
+                country_code:
+                  type: string
+                  description: ISO country code for phone number validation (2 characters)
+                  minLength: 2
+                  maxLength: 2
+                chunk_size:
+                  type: integer
+                  description: Number of phone numbers per chunk
+                  minimum: 1
+                  maximum: 10000
+              required:
+                - country_code
+                - chunk_size
+              oneOf:
+                - required: [numbers]
+                - required: [file]
+      responses:
+        '200':
+          description: File processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '400':
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/{upload}:
+    get:
+      summary: Get upload details
+      tags:
+        - Files
+      parameters:
+        - name: upload
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Upload details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UploadResponse'
+        '404':
+          description: Upload not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/{upload}/download/original:
+    get:
+      summary: Download original file
+      tags:
+        - Files
+      parameters:
+        - name: upload
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: File download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: File not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /files/{upload}/{chunk}/download/chunk:
+    get:
+      summary: Download a specific chunk
+      tags:
+        - Files
+      parameters:
+        - name: upload
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: chunk
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Chunk download
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Chunk not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    UploadResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+            original_file:
+              type: object
+              properties:
+                name:
+                  type: string
+                download_url:
+                  type: string
+                  format: uri
+            chunks:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  download_url:
+                    type: string
+                    format: uri
+                  size:
+                    type: integer
+                  index:
+                    type: integer
+            stats:
+              type: object
+              properties:
+                total:
+                  type: integer
+                valid:
+                  type: integer
+                invalid:
+                  type: integer
+            view_url:
+              type: string
+              format: uri
+              description: URL to view the upload details
+            created_at:
+              type: string
+              format: date-time
+            expires_at:
+              type: string
+              format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        message:
+          type: string
