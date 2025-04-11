@@ -3,8 +3,6 @@
 use App\Http\Controllers\PageController;
 use App\Models\Upload;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Arr;
 use Inertia\Inertia;
 
 Route::get('/', function () {

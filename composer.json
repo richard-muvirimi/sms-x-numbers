@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "sms-x-numbers",
+    "name": "sms-x/numbers",
     "type": "project",
     "version": "1.0.10",
     "description": "Easy Number parsing for import into SMS X.",
