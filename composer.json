@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "sms-x/numbers",
     "type": "project",
-    "version": "v1.0.12",
+    "version": "v1.0.13",
     "description": "Easy Number parsing for import into SMS X.",
     "authors": [
         {
