@@ -23,13 +23,13 @@ class FileUploadService
         ];
 
         // Ensure storage directories exist
-        Storage::disk('local')->makeDirectory('uploads/original');
-        Storage::disk('local')->makeDirectory('uploads/chunks');
+        Storage::makeDirectory('uploads/original');
+        Storage::makeDirectory('uploads/chunks');
 
         if ($file) {
             $extension = $file->getClientOriginalExtension() ?: 'txt';
             $path = 'uploads/original/'.$id.'.'.$extension;
-            Storage::disk('local')->putFileAs('uploads/original', $file, $id.'.'.$extension);
+            Storage::putFileAs('uploads/original', $file, $id.'.'.$extension);
 
             $uploadData = array_merge($uploadData, [
                 'name' => $file->getClientOriginalName(),
@@ -40,7 +40,7 @@ class FileUploadService
         } else {
             // Handle text input
             $path = 'uploads/original/'.$id.'.txt';
-            Storage::disk('local')->put($path, $textContent);
+            Storage::put($path, $textContent);
 
             $uploadData = array_merge($uploadData, [
                 'name' => $id.'.txt',
@@ -77,12 +77,12 @@ class FileUploadService
 
         foreach ($expiredUploads as $upload) {
             // Delete original file if it exists
-            Storage::disk('local')->delete($upload->original_path);
+            Storage::delete($upload->original_path);
 
             // Delete chunk files if they exist
             foreach ($upload->chunks as $chunk) {
                 if (isset($chunk['path'])) {
-                    Storage::disk('local')->delete($chunk['path']);
+                    Storage::delete($chunk['path']);
                 }
             }
 

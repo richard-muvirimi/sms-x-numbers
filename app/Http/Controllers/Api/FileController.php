@@ -93,14 +93,14 @@ class FileController extends Controller
     public function downloadUpload(Upload $upload)
     {
         $path = $upload->original_path;
-        if (! Storage::disk('local')->exists($path)) {
+        if (! Storage::exists($path)) {
             return response()->json([
                 'success' => false,
                 'message' => 'File not found',
             ], 404);
         }
 
-        return response()->download(Storage::disk('local')->path($path), $upload->name);
+        return Storage::download($path, $upload->name);
     }
 
     public function downloadChunk(Upload $upload, string $chunk)
@@ -115,13 +115,13 @@ class FileController extends Controller
         }
 
         $path = $chunkData['path'];
-        if (! Storage::disk('local')->exists($path)) {
+        if (! Storage::exists($path)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Chunk file not found',
             ], 404);
         }
 
-        return response()->download(Storage::disk('local')->path($path), $chunkData['id'].'.csv');
+        return Storage::download($path, $chunkData['id'].'.csv');
     }
 }

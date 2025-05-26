@@ -32,8 +32,8 @@ class CleanupExpiredFilesTest extends TestCase
         $recentUpload->original_path = 'uploads/original/'.$recentUpload->id.'.txt';
         $recentUpload->save();
 
-        Storage::disk('local')->put($expiredUpload->original_path, 'test content');
-        Storage::disk('local')->put($recentUpload->original_path, 'test content');
+        Storage::put($expiredUpload->original_path, 'test content');
+        Storage::put($recentUpload->original_path, 'test content');
 
         // Run command
         $this->artisan('files:cleanup')
@@ -43,11 +43,11 @@ class CleanupExpiredFilesTest extends TestCase
 
         // Assert expired upload was removed
         $this->assertDatabaseMissing('uploads', ['id' => $expiredUpload->id]);
-        $this->assertFalse(Storage::disk('local')->exists($expiredUpload->original_path));
+        $this->assertFalse(Storage::exists($expiredUpload->original_path));
 
         // Assert recent upload remains
         $this->assertDatabaseHas('uploads', ['id' => $recentUpload->id]);
-        $this->assertTrue(Storage::disk('local')->exists($recentUpload->original_path));
+        $this->assertTrue(Storage::exists($recentUpload->original_path));
     }
 
     public function test_cleanup_command_handles_errors()

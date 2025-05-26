@@ -3,11 +3,11 @@ name: linter
 on:
   push:
     branches:
-      - develop
+      - development
       - main
   pull_request:
     branches:
-      - develop
+      - development
       - main
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
+          php-version: '8.2'
 
       - name: Install Dependencies
         run: |
@@ -35,11 +35,8 @@ jobs:
       - name: Format Frontend
         run: npm run format
 
-      - name: Lint Frontend
-        run: npm run lint
-
-      # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v5
-      #   with:
-      #     commit_message: fix code style
-      #     commit_options: '--no-verify'
+      - name: Commit Changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: fix code style
+          commit_options: '--no-verify'

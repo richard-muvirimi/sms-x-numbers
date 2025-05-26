@@ -59,7 +59,7 @@ class FileControllerTest extends TestCase
             'original_path' => $upload->original_path,
         ]);
 
-        $this->assertTrue(Storage::disk('local')->exists($upload->original_path));
+        $this->assertTrue(Storage::exists($upload->original_path));
     }
 
     public function test_process_text_content()
@@ -146,7 +146,7 @@ class FileControllerTest extends TestCase
             'invalid_numbers' => 0,
         ]);
 
-        Storage::disk('local')->put($upload->original_path, 'test content');
+        Storage::put($upload->original_path, 'test content');
 
         $response = $this->get("/api/v1/files/{$upload->id}/download/original");
 
@@ -169,7 +169,7 @@ class FileControllerTest extends TestCase
             ],
         ]);
 
-        Storage::disk('local')->put('uploads/chunks/test-id/chunk1', 'test content');
+        Storage::put('uploads/chunks/test-id/chunk1', 'test content');
 
         $response = $this->get("/api/v1/files/{$upload->id}/chunk1/download/chunk");
 

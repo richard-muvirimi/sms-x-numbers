@@ -119,12 +119,16 @@ class PhoneNumberProcessingService
         $numbers = [];
 
         if ($upload->input_type === 'text') {
-            $content = Storage::disk('local')->get($upload->original_path);
+            $content = Storage::get($upload->original_path);
 
             return preg_split('/[,\n]/', $content, -1, PREG_SPLIT_NO_EMPTY);
         }
 
-        $filePath = Storage::disk('local')->path($upload->original_path);
+        // Copy file from remote disk to local temporary file
+        $tempPath = 'temp/' . basename($upload->original_path);
+        Storage::disk('local')->writeStream($tempPath, Storage::readStream($upload->original_path));
+        $filePath = Storage::disk('local')->path($tempPath);
+
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($filePath);
         $reader->setReadDataOnly(true);
         $spreadsheet = $reader->load($filePath);
@@ -142,6 +146,9 @@ class PhoneNumberProcessingService
                 }
             }
         }
+
+        // Clean up temporary file
+        Storage::disk('local')->delete($tempPath);
 
         return array_map('trim', $numbers);
     }
@@ -172,9 +179,8 @@ class PhoneNumberProcessingService
         $tempFile = tempnam(sys_get_temp_dir(), 'chunk_');
         $writer->save($tempFile);
 
-        // Move the file to storage using Laravel's Storage facade
-        Storage::disk('local')->put($path, file_get_contents($tempFile));
-        unlink($tempFile); // Clean up temp file
+        Storage::writeStream($path, fopen($tempFile, 'r'));
+        unlink($tempFile);
     }
 
     public function getDownloadUrl(string $filename): string
