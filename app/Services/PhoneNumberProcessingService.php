@@ -125,7 +125,7 @@ class PhoneNumberProcessingService
         }
 
         // Copy file from remote disk to local temporary file
-        $tempPath = 'temp/' . basename($upload->original_path);
+        $tempPath = 'temp/'.basename($upload->original_path);
         Storage::disk('local')->writeStream($tempPath, Storage::readStream($upload->original_path));
         $filePath = Storage::disk('local')->path($tempPath);
 
