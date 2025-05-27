@@ -75,7 +75,8 @@ RUN install-php-extensions \
     soap \
     xml \
     xsl \
-    zip
+    zip \
+    ftp
 
 RUN apt-get update && apt-get upgrade -y \
     && apt-get install -y curl \
