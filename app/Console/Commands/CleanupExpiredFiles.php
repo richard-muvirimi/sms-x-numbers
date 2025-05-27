@@ -7,7 +7,7 @@ use Illuminate\Console\Command;
 
 class CleanupExpiredFiles extends Command
 {
-    protected $signature = 'files:cleanup';
+    protected $signature = 'app:cleanup';
 
     protected $description = 'Clean up expired files';
 
